@@ -13,7 +13,7 @@ router.post('/sign-up', async(req, res, next) => {
         where : { email }
     })
     
-    if (confirmPassword !== password) {
+    if (confirmPassword !== password) {     // 비밀번호 재확인 실패할 경우
         return res.status(409).json({ message : '비밀번호가 일치 하지 않습니다.'});
     }
     if (isExistUser) {  // 동일한 이메일로 가입한 사용자가 있을 경우
@@ -42,7 +42,16 @@ router.post('/sign-up', async(req, res, next) => {
             character    // userInfo 모델에 있던 정보들
         }
     })
-    return res.status(201).json({ message : '회원가입이 완료되었습니다.'});
+    return res.status(201).json({
+        message : '회원가입이 완료되었습니다.',
+        userId : user.userId,
+        email : user.email,
+        name : userInfo.name,       // userInfo 라는 변수 안에서 name 값을 가져온다. name 값의 출처는 userInfos
+        age : userInfo.age,         
+        gender : userInfo.gender,
+        character : userInfo.character,
+        profileImage : userInfo.profileImage
+    });
 });
 
 export default router;  // 라우터 수출
