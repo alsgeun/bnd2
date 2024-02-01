@@ -41,7 +41,7 @@ model Resume {
   resumeId  Int @id @default(autoincrement()) @map("resumId")
   userId Int  @map("userId")
   resumeTitle String  @map("resumeTitle")
-  resumeStatus Status @default(APPLY)
+  resumeStatus Status @default(APPLY) @map("resumeStatus")
   authorsName String  @unique @map("authorsName")
   profileImage  String @map("profileImage")
   selfIntroduce String  @map("selfIntroduce")
