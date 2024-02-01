@@ -33,7 +33,7 @@ model UserInfos {
   createdAt DateTime @default(now())  @map("createdAt")
   updatedAt DateTime @updatedAt @map("updatedAt")
 
-  users Users @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  user Users @relation(fields: [userId], references: [userId], onDelete: Cascade)
   @@map("UserInfos")
 }
 
@@ -44,14 +44,14 @@ model Resume {
   resumeStatus Status @default(APPLY) @map("resumeStatus")
   authorsName String  @unique @map("authorsName")
   profileImage  String @map("profileImage")
-  selfIntroduce String  @map("selfIntroduce")
+  selfIntroduce String  @map("selfIntroduce") @db.Text
   name String @map("name")
   age Int @map("age")
   address String  @map("address")
   contact Int @map("contact")
   createdAt DateTime @default(now())  @map("createdAt")
   
-  users Users @relation(fields : [userId], references: [userId], onDelete: Cascade)
+  user Users @relation(fields : [userId], references: [userId], onDelete: Cascade)
   @@map("Resume")
 }
 
