@@ -18,10 +18,10 @@ export default async function (req, res, next) {
 
     // 검증된 토큰을 바탕으로 사용자 조회
     const user = await prisma.users.findFirst({
-        where : { userId : +userId} 
+        where : { userId : +userId}     // 검증된 토큰속 userId인데 +를 붙여주어 문자열이더라도 숫자로 변환시킴
     })
     if (!user) {
-        throw new Error('토큰 사용자가 존재하지 않습니다.');
+        throw new Error('토큰 사용자가 존재하지 않습니다.');    // catch error로 에러 패스
     }
     req.user = user;
     next();
