@@ -2,7 +2,7 @@ import express from "express";
 import { prisma } from "../src/utils/prisma/index.js";  // 프리즈마 클라이언트 소환
 import bcrypt from "bcrypt";    // 비크립트 소환!
 import jwt from "jsonwebtoken";
-
+import authMiddleware from "../middlewares/auth.middleware.js";
 const router = express.Router();    // 라우터 소환
 
 // 회원가입 api
@@ -67,10 +67,10 @@ router.post('/sign-in', async(req, res, next) =>{
         return res.status(401).json({ message : "존재하지 않는 이메일 입니다."})
     if (!await bcrypt.compare(password, user.password)) // bcrypt로 비교한다. 뭐를? (우리가 전달받은 비밀번호(req.body), user라는 변수에 담긴 비밀번호(users.db에 있는 비밀번호)를 그렇게 비교해서 일치하지 않다면?
         return res.status(401).json({ message : "일치하지 않는 비밀번호 입니다." })
-    // 나름 욕심을 내봤지만 보류
+    // //나름 욕심을 내봤지만 보류
     // if (!await bcrypt.compare(password, user.password) || !user)
     //      return res.status(401).json({ message : "이메일 또는 비밀번호가 일치하지 않습니다."})
-    
+
     // jwt 생성
     const token = jwt.sign  //jwt을 만들겠다 선언(sign)
     ({userId : user.userId}, // 안에 내용물은 userId인데 userId 출처는 바로 위에서 만든 user라는 변수에 담긴 userId를 쓸 것이다.
@@ -80,4 +80,30 @@ router.post('/sign-in', async(req, res, next) =>{
     res.cookie('authorization', `Bearer ${token}`)  // 로그인 성공시 쿠키를 만들어 보낼거고 쿠키의 내용물은 'authorization'이라는 key(name)와 'Bearer'가 앞에 붙고 뒤에는 직전에 만든 jwt가 들어감
     return res.status(200).json({ message : '로그인에 성공하였습니다.'})
 })
+
+// 사용자 정보 조회 api
+router.get('/users', authMiddleware, async(req, res, next) => {
+    const {userId} = req.user
+
+    const user = await prisma.users.findFirst({
+        where : { userId : +userId },   // 우리가 갖고 있는 userId와 전달받은 userId가 일치 하는지 찾아볼거다.
+        select : {                      // 조회할 users의 컬럼들 지정
+            userId : true,
+            email : true,
+            createdAt : true,
+            updatedAt : true,
+            userinfos : {               // 중첩셀렉문 사용 가능. user와 userinfos 테이블은 관계(1:1)를 맺었기 때문에 불러오기 가능
+                select : {
+                    name : true,
+                    age : true,
+                    gender : true,
+                    character : true,
+                    profileImage : true,
+                }
+            }
+        }
+    })
+    return res.status(200).json({ data : user });
+})
+
 export default router;  // 라우터 수출
