@@ -1,12 +1,14 @@
 import express from "express";
 import { prisma } from "../src/utils/prisma/index.js";  // 프리즈마 클라이언트 소환
 import bcrypt from "bcrypt";    // 비크립트 소환!
+import jwt from "jsonwebtoken";
 
 const router = express.Router();    // 라우터 소환
 
 // 회원가입 api
 router.post('/sign-up', async(req, res, next) => {
-    const { email, password, confirmPassword, name, age, gender,character, profileImage, } = req.body;  // 회원가입시 이런걸 적어라 하고 body에 담아 서버에게 요청
+    // 회원가입시 "이런걸 적어라" 하고 body에 담아 서버에게 요청
+    const { email, password, confirmPassword, name, age, gender,character, profileImage, } = req.body;  
     
     // 동일한 e메일 사용자 있는지 확인
     const isExistUser = await prisma.users.findFirst({  // 프리즈마 클라이언트로 users 테이블에서 찾아내고 변수에 저장
@@ -24,14 +26,14 @@ router.post('/sign-up', async(req, res, next) => {
     }
     // 비밀번호 암호화
     const hashedPassword = await bcrypt.hash (password, 10); // 비크립트를 통해 다져서 못알아보게 한다.(.hash) 뭐를? 비밀번호를(password,) 몇번? 10번.(10)
-    // 사용자 생성
-    const user = await prisma.users.create({    // users 모델에서 생성
+    // 사용자 생성(저장)
+    const user = await prisma.users.create({    // users 모델에서 생성(저장)
         data : { 
             email,
             password : hashedPassword,
          }              // email과 password를 이용해서 생성, 비밀번호는 hashedPassword(암호화된 비밀번호 형태)로 저장
     })
-    // 사용자 정보 생성
+    // 사용자 정보 생성(저장)
     const userInfo = await prisma.userInfos.create({
         data : {
             userId : user.userId,   // userId : 생성된 사용자(user)의 userId값 그대로 복사
@@ -54,4 +56,28 @@ router.post('/sign-up', async(req, res, next) => {
     });
 });
 
+// 로그인 api
+router.post('/sign-in', async(req, res, next) =>{
+    const { email, password } = req.body;   // 이렇게 써서 로그인해라
+    
+    const user = await prisma.users.findFirst({ where : {email}})   // users테이블에 저장된 email 중 중복여부(회원가입 여부) 확인, findFirst({where :{ }})는 그저 필터역할
+    
+    // 로그인 정보가 일치하지 않았을 때 메세지 출력
+    if(!user)   // 해당 사용자(이메일)이 없을때 == 회원가입이 안된 이메일이라면
+        return res.status(401).json({ message : "존재하지 않는 이메일 입니다."})
+    if (!await bcrypt.compare(password, user.password)) // bcrypt로 비교한다. 뭐를? (우리가 전달받은 비밀번호(req.body), user라는 변수에 담긴 비밀번호(users.db에 있는 비밀번호)를 그렇게 비교해서 일치하지 않다면?
+        return res.status(401).json({ message : "일치하지 않는 비밀번호 입니다." })
+    // 나름 욕심을 내봤지만 보류
+    // if (!await bcrypt.compare(password, user.password) || !user)
+    //      return res.status(401).json({ message : "이메일 또는 비밀번호가 일치하지 않습니다."})
+    
+    // jwt 생성
+    const token = jwt.sign  //jwt을 만들겠다 선언(sign)
+    ({userId : user.userId}, // 안에 내용물은 userId인데 userId 출처는 바로 위에서 만든 user라는 변수에 담긴 userId를 쓸 것이다.
+    'custom-secret-key'      // 이제부터 우리가 만든 jwt의 이름은 이거야!
+    )
+
+    res.cookie('authorization', `Bearer ${token}`)  // 로그인 성공시 쿠키를 만들어 보낼거고 쿠키의 내용물은 'authorization'이라는 key(name)와 'Bearer'가 앞에 붙고 뒤에는 직전에 만든 jwt가 들어감
+    return res.status(200).json({ message : '로그인에 성공하였습니다.'})
+})
 export default router;  // 라우터 수출
