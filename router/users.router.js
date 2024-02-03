@@ -73,12 +73,28 @@ router.post('/sign-in', async(req, res, next) =>{
     //      return res.status(401).json({ message : "이메일 또는 비밀번호가 일치하지 않습니다."})
 
     // jwt 생성
-    const token = jwt.sign  //jwt을 만들겠다 선언(sign)
-    ({userId : user.userId}, // 안에 내용물은 userId인데 userId 출처는 바로 위에서 만든 user라는 변수에 담긴 userId를 쓸 것이다.
-    'custom-secret-key'      // 이제부터 우리가 만든 jwt의 이름은 이거야!
+    const accessToken = jwt.sign  //jwt을 만들겠다 선언(sign)
+    ({ userId : user.userId }, // 안에 내용물은 userId인데 userId 출처는 바로 위에서 만든 user라는 변수에 담긴 userId를 쓸 것이다.
+    process.env.ACCESS_TOKEN_SECRET_KEY,    // 노출되면 안되는 비밀키
+    { expiresIn : '12h'}                    // 유효기간 12시간
+    )
+    const refreshToken = jwt.sign
+    ({ userId : user.userId },
+    process.env.REFRESH_TOKEN_SECRET_KEY,
+    { expiresIn : '7d'}
     )
 
-    res.cookie('authorization', `Bearer ${token}`)  // 로그인 성공시 쿠키를 만들어 보낼거고 쿠키의 내용물은 'authorization'이라는 key(name)와 'Bearer'가 앞에 붙고 뒤에는 직전에 만든 jwt가 들어감
+    // 발급한 리프레쉬 토큰 관리 객체
+    const tokenStorages = {}    
+    
+    tokenStorages[refreshToken] = {     // 리프레쉬 토큰을 발급 받은 사용자의 정보를 조회하는 것
+        userId : user.userId,   // 발급한 유저의 유저 아이디
+        ip : req.ip,    // 요청한 클라이언트의 ip를 따올것
+        userAgent : req.headers['user-agent'],   // 사용자가 어떠한 방식으로 요청을 보냈는지 브라우저 우클릭-검사-네트워크-header-req.headers 라는 부분의 user-agent 부분에서 가져옴
+    }
+
+    res.cookie('accessToken', `Bearer ${accessToken}`)  // 로그인 성공시 쿠키를 만들어 보낼거고 쿠키의 내용물은 'accessToken'이라는 key(name)와 'Bearer'가 앞에 붙고 뒤에는 직전에 만든 jwt가 들어감
+    res.cookie('refreshToken', `Bearer ${refreshToken}`)    // refresh token도 만들었으니 엑세스토큰과 같이 보냄
     return res.status(200).json({ message : '로그인에 성공하였습니다.'})
 })
 

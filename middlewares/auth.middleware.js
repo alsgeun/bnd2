@@ -11,8 +11,8 @@ export default async function (req, res, next) {
     if (tokenType !== 'Bearer') throw new Error ('토큰 타입이 Bearer가 아닙니다.');
         // throw new Error를 쓰는 이유는 에러를 그때그때 처리 안하고 밑에 catch(error)로 throw(던져서) 한번에 처리할 것이기 때문이다.
     
-    // jwt 검증. 성공하면 커스텀 시크릿 키! 실패하면 에러 아닙니까!
-    const decodedToken = jwt.verify(token, 'custom-secret-key');        // authorization을 반으로 나눈 token 형식과 서버(우리)가 준 토큰('custom-secret-key')이 맞는지 검증
+    // jwt 검증. 성공하면 decodedToken 실패하면 에러 아닙니까!
+    const decodedToken = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET_KEY);    // token부분이 비밀키 부분이랑 비교를 하는게 아니라 둘 다 검증받는건가..?        // authorization을 반으로 나눈 token 형식과 서버(우리)가 준 비밀키(ACCESS_TOKEN_SECRET_KEY)가 맞는지 검증
     
     const userId = decodedToken.userId; // 검증된 토큰(decodedToken)속 userId
 
