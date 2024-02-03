@@ -46,13 +46,14 @@ router.post('/sign-up', async(req, res, next) => {
     })
     return res.status(201).json({
         message : '회원가입이 완료되었습니다.',
-        userId : user.userId,
-        email : user.email,
-        name : userInfo.name,       // userInfo 라는 변수 안에서 name 값을 가져온다. name 값의 출처는 userInfos
-        age : userInfo.age,         
-        gender : userInfo.gender,
-        character : userInfo.character,
-        profileImage : userInfo.profileImage
+        userInfo
+        // userId : user.userId,
+        // email : user.email,
+        // name : userInfo.name,       // userInfo 라는 변수 안에서 name 값을 가져온다. name 값의 출처는 userInfos
+        // age : userInfo.age,         
+        // gender : userInfo.gender,
+        // character : userInfo.character,
+        // profileImage : userInfo.profileImage
     });
 });
 
