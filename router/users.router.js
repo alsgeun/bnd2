@@ -83,15 +83,15 @@ router.post('/sign-in', async(req, res, next) =>{
     process.env.REFRESH_TOKEN_SECRET_KEY,
     { expiresIn : '7d'}
     )
-
-    // 발급한 리프레쉬 토큰 관리 객체
-    const tokenStorages = {}    
     
-    tokenStorages[refreshToken] = {     // 리프레쉬 토큰을 발급 받은 사용자의 정보를 조회하는 것
-        userId : user.userId,   // 발급한 유저의 유저 아이디
-        ip : req.ip,    // 요청한 클라이언트의 ip를 따올것
-        userAgent : req.headers['user-agent'],   // 사용자가 어떠한 방식으로 요청을 보냈는지 브라우저 우클릭-검사-네트워크-header-req.headers 라는 부분의 user-agent 부분에서 가져옴
-    }
+    // 발급한 리프레쉬 토큰 관리 객체
+    // const tokenStorages = {}    
+    
+    // tokenStorages[refreshToken] = {     // 리프레쉬 토큰을 발급 받은 사용자의 정보를 조회하는 것
+    //     userId : user.userId,   // 발급한 유저의 유저 아이디
+    //     ip : req.ip,    // 요청한 클라이언트의 ip를 따올것
+    //     userAgent : req.headers['user-agent'],   // 사용자가 어떠한 방식으로 요청을 보냈는지 브라우저 우클릭-검사-네트워크-header-req.headers 라는 부분의 user-agent 부분에서 가져옴
+    // }
 
     res.cookie('accessToken', `Bearer ${accessToken}`)  // 로그인 성공시 쿠키를 만들어 보낼거고 쿠키의 내용물은 'accessToken'이라는 key(name)와 'Bearer'가 앞에 붙고 뒤에는 직전에 만든 jwt가 들어감
     res.cookie('refreshToken', `Bearer ${refreshToken}`)    // refresh token도 만들었으니 엑세스토큰과 같이 보냄
@@ -100,7 +100,7 @@ router.post('/sign-in', async(req, res, next) =>{
 
 // 사용자 정보 조회 api
 router.get('/users', authMiddleware, async(req, res, next) => {
-    const {userId} = req.user
+    const {userId} = req.locals.user
 
     const user = await prisma.users.findFirst({
         where : { userId : +userId },   // 우리가 갖고 있는 userId와 전달받은 userId가 일치 하는지 찾아볼거다.
