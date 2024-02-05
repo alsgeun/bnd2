@@ -64,13 +64,13 @@ router.post('/sign-in', async(req, res, next) =>{
     const user = await prisma.users.findFirst({ where : {email}})   // users테이블에 저장된 email 중 중복여부(회원가입 여부) 확인, findFirst({where :{ }})는 그저 필터역할
     
     // 로그인 정보가 일치하지 않았을 때 메세지 출력
-    if(!user)   // 해당 사용자(이메일)이 없을때 == 회원가입이 안된 이메일이라면
-        return res.status(401).json({ message : "존재하지 않는 이메일 입니다."})
-    if (!await bcrypt.compare(password, user.password)) // bcrypt로 비교한다. 뭐를? (우리가 전달받은 비밀번호(req.body), user라는 변수에 담긴 비밀번호(users.db에 있는 비밀번호)를 그렇게 비교해서 일치하지 않다면?
-        return res.status(401).json({ message : "일치하지 않는 비밀번호 입니다." })
-    // //나름 욕심을 내봤지만 보류
-    // if (!await bcrypt.compare(password, user.password) || !user)
-    //      return res.status(401).json({ message : "이메일 또는 비밀번호가 일치하지 않습니다."})
+    if (!await bcrypt.compare(password, user.password) || !user)
+         return res.status(401).json({ message : "이메일 또는 비밀번호가 일치하지 않습니다."})
+    // if(!user)   // 해당 사용자(이메일)이 없을때 == 회원가입이 안된 이메일이라면
+    //     return res.status(401).json({ message : "존재하지 않는 이메일 입니다."})
+    // if (!await bcrypt.compare(password, user.password)) // bcrypt로 비교한다. 뭐를? (우리가 전달받은 비밀번호(req.body), user라는 변수에 담긴 비밀번호(users.db에 있는 비밀번호)를 그렇게 비교해서 일치하지 않다면?
+    //     return res.status(401).json({ message : "일치하지 않는 비밀번호 입니다." })
+    
 
     // jwt 생성
     const accessToken = jwt.sign  //jwt을 만들겠다 선언(sign)
