@@ -7,6 +7,7 @@ const router = express.Router();    // 라우터 소환
 
 // 회원가입 api
 router.post('/sign-up', async(req, res, next) => {
+    try {
     // 회원가입시 "이런걸 적어라" 하고 body에 담아 서버에게 요청
     const { email, password, confirmPassword, name, age, gender,character, profileImage, } = req.body;  
     
@@ -55,6 +56,9 @@ router.post('/sign-up', async(req, res, next) => {
         // character : userInfo.character,
         // profileImage : userInfo.profileImage
     });
+} catch (err){
+    next()
+}   
 });
 
 // 로그인 api
