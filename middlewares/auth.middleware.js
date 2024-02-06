@@ -4,10 +4,12 @@ import {prisma} from '../src/utils/prisma/index.js'; // jwt 속 userId는 결국
 
 export default async function (req, res, next) {
     try {
-    const { authorization } = req.cookies;  // 우리가 만들어줬던 authorization을 cookies에 담아서 보내봐
-    if (!authorization) throw new Error('이거 아닌데?');  // 그거 맞아?
+    req.locals = {}
+        console.log(req.cookies)
+    const { accessToken } = req.cookies;  // 우리가 만들어줬던 authorization을 cookies에 담아서 보내봐
+    if (!accessToken) throw new Error('이거 아닌데?');  // 그거 맞아?
 
-    const [tokenType, token] = authorization.split(' ');    // authorization 토큰을 split을 이용해 두개로 분리하고, 분리된 것들은 각각 tokenType, token 으로 불린다.
+    const [tokenType, token] = accessToken.split(' ');    // authorization 토큰을 split을 이용해 두개로 분리하고, 분리된 것들은 각각 tokenType, token 으로 불린다.
     if (tokenType !== 'Bearer') throw new Error ('토큰 타입이 Bearer가 아닙니다.');
         // throw new Error를 쓰는 이유는 에러를 그때그때 처리 안하고 밑에 catch(error)로 throw(던져서) 한번에 처리할 것이기 때문이다.
     

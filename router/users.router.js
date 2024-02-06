@@ -3,6 +3,7 @@ import { prisma } from "../src/utils/prisma/index.js";  // 프리즈마 클라�
 import bcrypt from "bcrypt";    // 비크립트 소환!
 import jwt from "jsonwebtoken";
 import authMiddleware from "../middlewares/auth.middleware.js";
+
 const router = express.Router();    // 라우터 소환
 
 // 회원가입 api

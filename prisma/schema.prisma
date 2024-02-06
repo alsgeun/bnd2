@@ -42,7 +42,6 @@ model Resume {
   userId Int  @map("userId")
   resumeTitle String  @map("resumeTitle")
   resumeStatus Status @default(APPLY) @map("resumeStatus")
-  authorsName String  @unique @map("authorsName")
   profileImage  String @map("profileImage")
   selfIntroduce String  @map("selfIntroduce") @db.Text
   name String @map("name")
