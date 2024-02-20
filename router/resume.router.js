@@ -116,4 +116,97 @@ router.get('/resume/:resumeId', authMiddleware, async (req, res) => {
     return res.json({ data: resume });
 })
 
+// 이력서 수정
+router.patch('/resume/:resumeId', authMiddleware, async (req, res) => {
+    const user = req.locals.user;
+    const resumeId = req.params.resumeId;
+    const { resumeTitle,
+        resumeStatus,
+        name,
+        age,
+        address,
+        contact, } = req.body;
+    
+    // 에러 메세지 출력
+    if (!resumeId) {
+        return res.status(400).json({
+            success: false,
+            message: 'resumeId 는 필수값입니다',
+        })
+    }
+    if (!resumeTitle) {
+        return res.status(400).json({
+            success: false,
+            message: '이력서 제목은 필수값입니다',
+        })
+    }
+    if (!name) {
+        return res.status(400).json({
+            success: false,
+            message: '이름은 필수값입니다',
+        })
+    }
+    if (!age) {
+        return res.status(400).json({
+            success: false,
+            message: '나이는 필수값입니다',
+        })
+    }
+    if (!address) {
+        return res.status(400).json({
+            success: false,
+            message: '주소는 필수값입니다',
+        })
+    }
+    if (!contact) {
+        return res.status(400).json({
+            success: false,
+            message: '연락처는 필수값입니다',
+        })
+    }
+    // status 는 있긴한데 6가지 중 해당되지 않을 경우
+    if (!['APPLY', 'DROP', 'PASS', 'INTERVIEW1', 'INTERVIEW2', 'FINAL_PASS'].includes(resumeStatus)) {
+        return res.status(400).json({
+            success: false,
+            message: '올바르지 않은 상태값 입니다.',
+        })
+    }
+
+    const resume = await prisma.resume.findFirst({
+        where: {
+            resumeId: Number(resumeId),
+        }
+    });
+
+    if (!resume) {
+        return res.status(400).json({
+            success: false,
+            message: '존재하지 않는 이력서 입니다.',
+        })
+    }
+
+    if (resume.userId !== user.userId) {
+        return res.status(400).json({
+            success: false,
+            message: '본인 이력서만 수정 가능합니다.',
+        })
+    }
+
+    // 본인이 작성한 이력서인게 확인 됨
+    await prisma.resume.update({
+        where: {
+            resumeId: Number(resumeId),
+        },
+        data: {
+            resumeTitle,
+            resumeStatus,
+            name,
+            age,
+            address,
+            contact,
+        }
+    })
+
+    return res.status(201).json({ message: "이력서 수정이 완료 되었습니다." })
+})
 export default router;
