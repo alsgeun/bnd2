@@ -34,7 +34,7 @@ router.post("/resume", authMiddleware, async (req, res, next) => {
 });
 
 // 이력서 목록 조회
-router.get('/', async (req, res) => {
+router.get('/resume', async (req, res) => {
     const orderKey = req.query.orderKey ?? 'resumeId';
     const orderValue = req.query.orderValue ?? 'desc';
 
@@ -74,6 +74,46 @@ router.get('/', async (req, res) => {
     })
 
     return res.json({ data: resumes });
+})
+// 상세조회
+router.get('/resume/:resumeId', authMiddleware, async (req, res) => {
+    const resumeId = req.params.resumeId;
+    if (!resumeId) {
+        return res.status(400).json({
+            success: false,
+            message: 'resumeId는 필수값입니다.'
+        })
+    }
+
+    const resume = await prisma.resume.findFirst({
+        where: {
+            resumeId: Number(resumeId),
+        },
+        select: {
+            resumeId: true,
+            userId: true,
+            resumeTitle: true,
+            resumeStatus: true,
+            name:true,
+            age:true,
+           
+            userInfos: {
+                select: {
+                    gender:true,
+                    character: true,
+                }
+            },
+            contact:true,
+            address:true,
+            createdAt: true,
+        },
+    })
+
+    if (!resume) {
+        return res.json({ data: {} });
+    }
+
+    return res.json({ data: resume });
 })
 
 export default router;
