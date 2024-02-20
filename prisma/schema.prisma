@@ -11,48 +11,53 @@ datasource db {
 }
 
 model Users {
-  userId Int @id @default(autoincrement()) @map("userId")
-  email String @unique @map("email")
-  password String @map("password")
+  userId    Int      @id @default(autoincrement()) @map("userId")
+  email     String   @unique @map("email")
+  password  String   @map("password")
   createdAt DateTime @default(now()) @map("createdAt")
   updatedAt DateTime @updatedAt @map("updatedAt")
 
   userinfos UserInfos?
-  resume    Resume[]
+  resume    Resume[] @relation("UserToResume")
+
   @@map("Users")
 }
 
 model UserInfos {
-  userinfoId Int @id @default(autoincrement()) @map("userinfoId")
-  userId Int @unique @map("userId")
-  name String @map("name")
-  age Int @map("age")
-  gender String @map("gender")
-  character String? @map("character")
-  profileImage String @map("profileImage")
-  createdAt DateTime @default(now())  @map("createdAt")
-  updatedAt DateTime @updatedAt @map("updatedAt")
+  userinfoId   Int      @id @default(autoincrement()) @map("userinfoId")
+  userId       Int      @unique @map("userId")
+  name         String   @map("name")
+  age          Int      @map("age")
+  gender       String   @map("gender")
+  character    String?  @map("character")
+  profileImage String?   @map("profileImage")
+  createdAt    DateTime @default(now()) @map("createdAt")
+  updatedAt    DateTime @updatedAt @map("updatedAt")
 
   user Users @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  resume Resume[] @relation("UserInfosToResume")
+
   @@map("UserInfos")
 }
 
 model Resume {
-  resumeId  Int @id @default(autoincrement()) @map("resumId")
-  userId Int  @map("userId")
-  resumeTitle String  @map("resumeTitle")
-  resumeStatus Status @default(APPLY) @map("resumeStatus")
-  profileImage  String @map("profileImage")
-  selfIntroduce String  @map("selfIntroduce") @db.Text
-  name String @map("name")
-  age Int @map("age")
-  address String  @map("address")
-  contact Int @map("contact")
-  createdAt DateTime @default(now())  @map("createdAt")
-  
-  user Users @relation(fields : [userId], references: [userId], onDelete: Cascade)
+  resumeId      Int      @id @default(autoincrement()) @map("resumId")
+  userId        Int      @map("userId")
+  resumeTitle   String   @map("resumeTitle")
+  resumeStatus  Status   @default(APPLY) @map("resumeStatus")
+  profileImage  String?   @map("profileImage")
+  selfIntroduce String?   @map("selfIntroduce") @db.Text
+  name          String   @map("name")
+  age           Int      @map("age")
+  address       String   @map("address")
+  contact       String   @map("contact")
+  createdAt     DateTime @default(now()) @map("createdAt")
+
+  users     Users      @relation("UserToResume", fields: [userId], references: [userId], onDelete: Cascade, map: "UserToResume_FK")
+  userInfos UserInfos  @relation("UserInfosToResume", fields: [userId], references: [userId], onDelete: Cascade, map: "UserInfoToResume_FK")
   @@map("Resume")
 }
+
 
 enum Status {
   APPLY
