@@ -209,4 +209,46 @@ router.patch('/resume/:resumeId', authMiddleware, async (req, res) => {
 
     return res.status(201).json({ message: "이력서 수정이 완료 되었습니다." })
 })
+
+// 이력서 삭제
+router.delete('/resume/:resumeId', authMiddleware, async (req, res) => {
+    const user = req.locals.user;
+    const resumeId = req.params.resumeId;
+
+    if (!resumeId) {
+        return res.status(400).json({
+            success: false,
+            message: 'resumeId 는 필수값입니다',
+        })
+    }
+    // 삭제할 이력서 아이디 찾기
+    const resume = await prisma.resume.findFirst({
+        where: {
+            resumeId: Number(resumeId),
+        }
+    });
+    // 삭제할 이력서 아이디가 없다면
+    if (!resume) {
+        return res.status(400).json({
+            success: false,
+            message: '존재하지 않는 이력서 입니다.',
+        })
+    }
+    // 인증된 사용자와 이력서를 작성한 사용자가 다를 경우
+    if (resume.userId !== user.userId) {
+        return res.status(400).json({
+            success: false,
+            message: '너 누구야',
+        })
+    }
+
+    await prisma.resume.delete({
+        where: {
+            resumeId: Number(resumeId),
+        },
+    })
+
+    return res.status(201).json({ message : "이력서가 삭제되었습니다." })
+})
+
 export default router;
