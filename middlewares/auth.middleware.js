@@ -29,7 +29,7 @@ export default async function (req, res, next) {
     next();         // req.locals.user에 검증 완료된 user를 담아 보낸다.
 
     } catch (error) {
-        if (error.name === 'TokenEpiredError')
+        if (error.name === 'TokenExpiredError')
         return res.status(401).json({ message : '토큰이 만료되었습니다.' });
         if (error.name === 'JsonWebTokenError')
         return res.status(401).json({ message : '토큰이 이상합니다.'});

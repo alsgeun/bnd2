@@ -71,10 +71,33 @@ export class UserRepository {
     //     })
     //     return userInfo
     // }
-    // signIn = async (email, password) => {
-    // // 전달 받은 이메일과 비밀번호가 db속 데이터와 일치 하는지 확인
-    // const user = await prisma.users.findFirst({ where : {email} })
-    // if (!await bcrypt.compare(password, user.password) || !user)
-    //      return res.status(401).json({ message : "이메일 또는 비밀번호가 일치하지 않습니다."})
-    // }
+
+    // 로그인
+    findUserId = async (email) => {
+        const user = await prisma.users.findFirst({ where : {email}})
+        return user
+    }
+
+    // 정보조회
+    myInfo = async (userId) => {
+        const user = await prisma.users.findFirst({
+            where : { userId : +userId },   // 우리가 갖고 있는 userId와 전달받은 userId가 일치 하는지 찾아볼거다.
+            select : {                      // 조회할 users의 컬럼들 지정
+                userId : true,
+                email : true,
+                createdAt : true,
+                updatedAt : true,
+                userinfos : {               // 중첩셀렉문 사용 가능. user와 userinfos 테이블은 관계(1:1)를 맺었기 때문에 불러오기 가능
+                    select : {
+                        name : true,
+                        age : true,
+                        gender : true,
+                        character : true,
+                        profileImage : true,
+                    }
+                }
+            }
+        })
+        return user
+    }
 }
