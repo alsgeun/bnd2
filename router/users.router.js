@@ -68,46 +68,46 @@ const router = express.Router();    // 라우터 소환
 // });
 
 // // 로그인 api
-// router.post('/sign-in', async(req, res, next) =>{
-//     const { email, password } = req.body;   // 이렇게 써서 로그인해라   // controller
+router.post('/sign-in', async(req, res, next) =>{
+    const { email, password } = req.body;   // 이렇게 써서 로그인해라   // controller
     
-//     // repository?
-//     const user = await prisma.users.findFirst({ where : {email}})   // users테이블에 저장된 email 중 중복여부(회원가입 여부) 확인, findFirst({where :{ }})는 그저 필터역할
+    // repository?
+    const user = await prisma.users.findFirst({ where : {email}})   // users테이블에 저장된 email 중 중복여부(회원가입 여부) 확인, findFirst({where :{ }})는 그저 필터역할
     
-//     // 로그인 정보가 일치하지 않았을 때 메세지 출력
-//     if (!await bcrypt.compare(password, user.password) || !user)
-//          return res.status(401).json({ message : "이메일 또는 비밀번호가 일치하지 않습니다."})
-//     // if(!user)   // 해당 사용자(이메일)이 없을때 == 회원가입이 안된 이메일이라면
-//     //     return res.status(401).json({ message : "존재하지 않는 이메일 입니다."})
-//     // if (!await bcrypt.compare(password, user.password)) // bcrypt로 비교한다. 뭐를? (우리가 전달받은 비밀번호(req.body), user라는 변수에 담긴 비밀번호(users.db에 있는 비밀번호)를 그렇게 비교해서 일치하지 않다면?
-//     //     return res.status(401).json({ message : "일치하지 않는 비밀번호 입니다." })
+    // 로그인 정보가 일치하지 않았을 때 메세지 출력
+    if (!await bcrypt.compare(password, user.password) || !user)
+         return res.status(401).json({ message : "이메일 또는 비밀번호가 일치하지 않습니다."})
+    // if(!user)   // 해당 사용자(이메일)이 없을때 == 회원가입이 안된 이메일이라면
+    //     return res.status(401).json({ message : "존재하지 않는 이메일 입니다."})
+    // if (!await bcrypt.compare(password, user.password)) // bcrypt로 비교한다. 뭐를? (우리가 전달받은 비밀번호(req.body), user라는 변수에 담긴 비밀번호(users.db에 있는 비밀번호)를 그렇게 비교해서 일치하지 않다면?
+    //     return res.status(401).json({ message : "일치하지 않는 비밀번호 입니다." })
     
 
-//     // jwt 생성 // service?
-//     const accessToken = jwt.sign  //jwt을 만들겠다 선언(sign)
-//     ({ userId : user.userId }, // 안에 내용물은 userId인데 userId 출처는 바로 위에서 만든 user라는 변수에 담긴 userId를 쓸 것이다.
-//     process.env.ACCESS_TOKEN_SECRET_KEY,    // 노출되면 안되는 비밀키
-//     { expiresIn : '12h'}                    // 유효기간 12시간
-//     )
-//     const refreshToken = jwt.sign
-//     ({ userId : user.userId },
-//     process.env.REFRESH_TOKEN_SECRET_KEY,
-//     { expiresIn : '7d'}
-//     )
+    // jwt 생성 // service?
+    const accessToken = jwt.sign  //jwt을 만들겠다 선언(sign)
+    ({ userId : user.userId }, // 안에 내용물은 userId인데 userId 출처는 바로 위에서 만든 user라는 변수에 담긴 userId를 쓸 것이다.
+    process.env.ACCESS_TOKEN_SECRET_KEY,    // 노출되면 안되는 비밀키
+    { expiresIn : '12h'}                    // 유효기간 12시간
+    )
+    const refreshToken = jwt.sign
+    ({ userId : user.userId },
+    process.env.REFRESH_TOKEN_SECRET_KEY,
+    { expiresIn : '7d'}
+    )
     
-//     // 발급한 리프레쉬 토큰 관리 객체
-//     // const tokenStorages = {}    
+    // 발급한 리프레쉬 토큰 관리 객체
+    // const tokenStorages = {}    
     
-//     // tokenStorages[refreshToken] = {     // 리프레쉬 토큰을 발급 받은 사용자의 정보를 조회하는 것
-//     //     userId : user.userId,   // 발급한 유저의 유저 아이디
-//     //     ip : req.ip,    // 요청한 클라이언트의 ip를 따올것
-//     //     userAgent : req.headers['user-agent'],   // 사용자가 어떠한 방식으로 요청을 보냈는지 브라우저 우클릭-검사-네트워크-header-req.headers 라는 부분의 user-agent 부분에서 가져옴
-//     // }
-//     // controller?
-//     res.cookie('accessToken', `Bearer ${accessToken}`)  // 로그인 성공시 쿠키를 만들어 보낼거고 쿠키의 내용물은 'accessToken'이라는 key(name)와 'Bearer'가 앞에 붙고 뒤에는 직전에 만든 jwt가 들어감
-//     res.cookie('refreshToken', `Bearer ${refreshToken}`)    // refresh token도 만들었으니 엑세스토큰과 같이 보냄
-//     return res.status(200).json({ message : '로그인에 성공하였습니다.'})
-// })
+    // tokenStorages[refreshToken] = {     // 리프레쉬 토큰을 발급 받은 사용자의 정보를 조회하는 것
+    //     userId : user.userId,   // 발급한 유저의 유저 아이디
+    //     ip : req.ip,    // 요청한 클라이언트의 ip를 따올것
+    //     userAgent : req.headers['user-agent'],   // 사용자가 어떠한 방식으로 요청을 보냈는지 브라우저 우클릭-검사-네트워크-header-req.headers 라는 부분의 user-agent 부분에서 가져옴
+    // }
+    // controller?
+    res.cookie('accessToken', `Bearer ${accessToken}`)  // 로그인 성공시 쿠키를 만들어 보낼거고 쿠키의 내용물은 'accessToken'이라는 key(name)와 'Bearer'가 앞에 붙고 뒤에는 직전에 만든 jwt가 들어감
+    res.cookie('refreshToken', `Bearer ${refreshToken}`)    // refresh token도 만들었으니 엑세스토큰과 같이 보냄
+    return res.status(200).json({ message : '로그인에 성공하였습니다.'})
+})
 
 // 사용자 정보 조회 api
 router.get('/users', authMiddleware, async(req, res, next) => {

@@ -10,7 +10,7 @@ const userController = new UserController()
 router.post('/sign-up', userController.signUp)
 
 // 로그인 api
-router.post('/sign-in', userController.signIn)
+// router.post('/sign-in', userController.signIn)
 
 
 

@@ -6,7 +6,8 @@ const router = express.Router();
 
 // 이력서 작성
 router.post("/resume", authMiddleware, async (req, res, next) => {
-  const {
+    // controller
+    const {
     resumeTitle,
     selfIntroduce,
     profileImage,
@@ -17,6 +18,7 @@ router.post("/resume", authMiddleware, async (req, res, next) => {
   } = req.body; // 이력서인데 이정돈 써야지
   const { userId } = req.locals.user; // 검증된 사용자의 userId
 
+  // repository
   const resume = await prisma.resume.create({
     // resume에다 생성할 것이다.
     data: {
@@ -34,87 +36,93 @@ router.post("/resume", authMiddleware, async (req, res, next) => {
 });
 
 // 이력서 목록 조회
-router.get('/resume', async (req, res) => {
-    const orderKey = req.query.orderKey ?? 'resumeId';
-    const orderValue = req.query.orderValue ?? 'desc';
+// router.get('/resume', async (req, res) => {
+//     // controller
+//     const orderKey = req.query.orderKey ?? 'resumeId';
+//     const orderValue = req.query.orderValue ?? 'desc';
 
-    if (!['resumeId', 'status'].includes(orderKey)) {
-        return res.status(400).json({
-            success: false,
-            message: 'orderKey 가 올바르지 않습니다.'
-        })
-    }
+//     if (!['resumeId', 'status'].includes(orderKey)) {
+//         return res.status(400).json({
+//             success: false,
+//             message: 'orderKey 가 올바르지 않습니다.'
+//         })
+//     }
 
-    if (!['asc', 'desc'].includes(orderValue.toLowerCase())) {
-        return res.status(400).json({
-            success: false,
-            message: 'orderValue 가 올바르지 않습니다.'
-        })
-    }
+//     if (!['asc', 'desc'].includes(orderValue.toLowerCase())) {
+//         return res.status(400).json({
+//             success: false,
+//             message: 'orderValue 가 올바르지 않습니다.'
+//         })
+//     }
 
-    const resumes = await prisma.resume.findMany({
-        select: {
-            resumeId: true,
-            userId: true,
-            resumeTitle: true,
-            resumeStatus: true,
-            name:true,
-            userInfos: {
-                select: {
-                    character: true,
-                }
-            },
-            createdAt: true,
-        },
-        orderBy: [
-            {
-                [orderKey]: orderValue.toLowerCase(),
-            }
-        ]
-    })
+//     repository
+//     const resumes = await prisma.resume.findMany({
+//         select: {
+//             resumeId: true,
+//             userId: true,
+//             resumeTitle: true,
+//             resumeStatus: true,
+//             name:true,
+//             userInfos: {
+//                 select: {
+//                     character: true,
+//                 }
+//             },
+//             createdAt: true,
+//         },
+//         orderBy: [
+//             {
+//                 [orderKey]: orderValue.toLowerCase(),
+//             }
+//         ]
+//     })
 
-    return res.json({ data: resumes });
-})
+//     return res.json({ data: resumes });
+// })
+
+
 // 상세조회
-router.get('/resume/:resumeId', authMiddleware, async (req, res) => {
-    const resumeId = req.params.resumeId;
-    if (!resumeId) {
-        return res.status(400).json({
-            success: false,
-            message: 'resumeId는 필수값입니다.'
-        })
-    }
+// router.get('/resume/:resumeId', authMiddleware, async (req, res) => {
+//     // controller
+//     const resumeId = req.params.resumeId;
+//     if (!resumeId) {
+//         return res.status(400).json({
+//             success: false,
+//             message: 'resumeId는 필수값입니다.'
+//         })
+//     }
 
-    const resume = await prisma.resume.findFirst({
-        where: {
-            resumeId: Number(resumeId),
-        },
-        select: {
-            resumeId: true,
-            userId: true,
-            resumeTitle: true,
-            resumeStatus: true,
-            name:true,
-            age:true,
+//     repository
+//     const resume = await prisma.resume.findFirst({
+//         where: {
+//             resumeId: Number(resumeId),
+//         },
+//         select: {
+//             resumeId: true,
+//             userId: true,
+//             resumeTitle: true,
+//             resumeStatus: true,
+//             name:true,
+//             age:true,
            
-            userInfos: {
-                select: {
-                    gender:true,
-                    character: true,
-                }
-            },
-            contact:true,
-            address:true,
-            createdAt: true,
-        },
-    })
+//             userInfos: {
+//                 select: {
+//                     gender:true,
+//                     character: true,
+//                 }
+//             },
+//             contact:true,
+//             address:true,
+//             createdAt: true,
+//         },
+//     })
 
-    if (!resume) {
-        return res.json({ data: {} });
-    }
+//     if (!resume) {
+//         return res.json({ data: {} });
+//     }
 
-    return res.json({ data: resume });
-})
+//     return res.json({ data: resume });
+// })
 
 // 이력서 수정
 router.patch('/resume/:resumeId', authMiddleware, async (req, res) => {
