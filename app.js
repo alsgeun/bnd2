@@ -4,7 +4,7 @@ import UsersRouter from "./router/users.router.js";
 import ResumeRouter from "./router/resume.router.js";
 import AuthRouter from "./router/auth.router.js";
 import aaRouter from "./router/aa.router.js";
-import bbRouter from "./router/bb.router.js"
+import realResumeRouter from "./router/realresume.router.js"
 import logMiddleware from "./middlewares/log.middleware.js";
 import errorHandlingMiddleware from "./middlewares/error.handling.middleware.js";
 
@@ -17,7 +17,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 // 라우터 등록
-app.use('/', [UsersRouter, ResumeRouter, AuthRouter, aaRouter, bbRouter]);
+app.use('/', [UsersRouter, ResumeRouter, AuthRouter, aaRouter, realResumeRouter]);
 
 app.use(errorHandlingMiddleware);  // 위에 있던 에러들을 종합해서 처리해야 되기 때문에 에러처리 미들웨어는 최하단에 위치한다.
 
