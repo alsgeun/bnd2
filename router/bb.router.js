@@ -13,6 +13,12 @@ router.get('/resume', resumeController.findAllResume)
 router.get('/resume/:resumeId', resumeController.detailResume)
 
 // 이력서 작성
-// router.post('/resume', authMiddleware, resumeController.postResume)
+router.post('/resume', authMiddleware, resumeController.postResume)
+
+// 이력서 수정
+router.patch('/resume/:resumeId', authMiddleware, resumeController.updateResume)
+
+// 이력서 삭제
+router.delete('/resume/:resumeId', authMiddleware, resumeController.deleteResume)
 
 export default router

@@ -9,7 +9,7 @@ export class UserController {
             const { email, password, confirmPassword, name, age, gender, character, profileImage } = req.body;
 
             // userService에 signUp이라는 메서드를 호출하고 정보들을 넘겨줌
-            const userInfo = await this.userService.signUp(email, password, confirmPassword, name, age, gender, character, profileImage);
+            const userInfo = await this.userService.signUp(email, password, name, age, gender, character, profileImage);
             
             // 컨트롤러에게서 넘겨받은 비밀번호 확인 // res를 활용해서 직접적으로 표시하기 위해 에러를 컨트롤러에서 처리
             if (confirmPassword !== password) {     
